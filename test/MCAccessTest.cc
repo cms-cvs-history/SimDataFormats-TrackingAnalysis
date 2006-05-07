@@ -46,10 +46,10 @@ void MCAccessTest::analyze(const edm::Event& e, const edm::EventSetup& c){
   e.getByType(hepMC);
   cout <<" Got HepMC "<<endl;
   const edm::HepMCProduct * mcp = hepMC.product();
-  //
+
   // print the event
   //
-  //  std::cout<<" Event: "<<mcp->print()<<endl;
+  //  std::cout<<" Event: "<<*(mcp->GetEvent())<<endl;
 
   //
   // loop over it
