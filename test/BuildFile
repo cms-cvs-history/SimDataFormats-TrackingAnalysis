@@ -2,6 +2,7 @@
 <use name=clhep>
 <use name=DataFormats/TrackReco>
 <use name=SimDataFormats/Track>
+<use name=SimDataFormats/Vertex>
 <use name=SimDataFormats/HepMCProduct>
 <use name=geant4>
 
