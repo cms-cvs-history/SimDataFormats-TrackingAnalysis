@@ -1,3 +1,4 @@
+#include "SimDataFormats/TrackingAnalysis/test/MCAccessTest.h"
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/Handle.h"
@@ -18,21 +19,6 @@
 //
 // should probably go to simGeneral .... well, for the moment I put it here ...
 // 
-
-
-class MCAccessTest  : public edm::EDAnalyzer {
- public:
-
-  explicit MCAccessTest(const edm::ParameterSet& conf);
-
-  virtual ~MCAccessTest(){}
-
-  virtual void analyze(const edm::Event& e, const edm::EventSetup& c);
-
- private:
-  edm::ParameterSet conf_;
-
-};
 
 MCAccessTest::MCAccessTest(const edm::ParameterSet& conf){
   conf_ = conf;
@@ -89,8 +75,3 @@ void MCAccessTest::analyze(const edm::Event& e, const edm::EventSetup& c){
   }
 
 }
-
-
-DEFINE_SEAL_MODULE();
-DEFINE_ANOTHER_FWK_MODULE(MCAccessTest);
-

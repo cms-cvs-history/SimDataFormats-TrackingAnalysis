@@ -6,7 +6,7 @@
 <use name=SimDataFormats/HepMCProduct>
 <use name=geant4>
 
-<library file=MCAccessTest.cc name=MCAccessTest>
+<library file="MCAccessTest.cc,TrackingParticleProducer.cc,SealModule.cc" name=SimDataFormatsTrackingAnalysis_test>
   <use name=FWCore/Framework>
-  <flags SEAL_PLUGIN_NAME="MCAccessTest">
+  <flags SEAL_PLUGIN_NAME="SimDataFormatsTrackingAnalysis_test">
 </library>
