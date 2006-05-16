@@ -1,9 +1,8 @@
 <use name=SimDataFormats/TrackingAnalysis>
-<use name=clhep>
-<use name=DataFormats/TrackReco>
 <use name=SimDataFormats/Track>
 <use name=SimDataFormats/Vertex>
 <use name=SimDataFormats/HepMCProduct>
+<use name=clhep>
 <use name=geant4>
 
 <library file="MCAccessTest.cc,TrackingParticleProducer.cc,SealModule.cc" name=SimDataFormatsTrackingAnalysis_test>
