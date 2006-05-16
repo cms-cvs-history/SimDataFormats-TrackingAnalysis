@@ -28,12 +28,13 @@ void TrackingParticleProducer::produce( Event & event, const EventSetup & ) {
   auto_ptr<TrackingParticleCollection> tpc( new TrackingParticleCollection );  
 
   int index = 0;
-  for ( EmbdSimTrackContainer::const_iterator t = g4Tracks->begin(); 
-	t != g4Tracks->end(); ++ t, ++ index ) {
-    const HepLorentzVector & l = t->momentum();
+  for ( EmbdSimTrackContainer::const_iterator trk = g4Tracks->begin(); 
+	trk != g4Tracks->end(); ++ trk, ++ index ) {
+    const HepLorentzVector & l = trk->momentum();
     TrackingParticle::LorentzVector p( l.x(), l.y(), l.z(), l.t() );
     TrackingParticle::Point v( 0, 0, 0 );
-    int i_gp = t->genpartIndex(), i_gv = t->vertIndex();
+    double t = 0;
+    int i_gp = trk->genpartIndex(), i_gv = trk->vertIndex();
     const HepMC::GenParticle * gp = 0;
     TrackingParticle::Charge q = 0;
     int id = 0;
@@ -47,10 +48,11 @@ void TrackingParticleProducer::produce( Event & event, const EventSetup & ) {
       const EmbdSimVertex & gv = ( * g4Vertices )[ i_gv ];
       const HepLorentzVector & d = gv.position();
       v = TrackingParticle::Point( d.x(), d.y(), d.z() );
+      t = d.t();
     }
     cout << "create tracking particle" << endl;
     
-    TrackingParticle tp( q, p, v, id );
+    TrackingParticle tp( q, p, v, t, id );
     tp.setG4Track( EmbdSimTrackRef( g4Tracks, index ) );
     if ( gp != 0 ) tp.setGenParticle( gp );
     tpc->push_back( tp );
