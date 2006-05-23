@@ -5,6 +5,7 @@
 #include "FWCore/Framework/interface/Handle.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
+#include "FWCore/Utilities/interface/EDMException.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 #include "DataFormats/Common/interface/EDProduct.h"
@@ -16,7 +17,7 @@
 #include "SimDataFormats/TrackingAnalysis/interface/TrackingVertexContainer.h"
 
 #include "SimDataFormats/HepMCProduct/interface/HepMCProduct.h"
-
+#include <exception>
 //
 // should probably go to simGeneral .... well, for the moment I put it here ...
 // 
@@ -27,6 +28,8 @@ using namespace std;
 
 MCAccessTestV::MCAccessTestV(const edm::ParameterSet& conf){
   conf_ = conf;
+  distanceCut_ = conf_.getParameter<double>("distanceCut");
+  dataLabels_  = conf_.getParameter<vector<string> >("dataLabels");
 }
 
 void MCAccessTestV::analyze(const edm::Event& event, const edm::EventSetup& c){
@@ -39,18 +42,34 @@ void MCAccessTestV::analyze(const edm::Event& event, const edm::EventSetup& c){
 
   // Get information out of event record
   
-  event.getByLabel("VtxSmeared",hepMC);
+  for (vector<string>::const_iterator source = dataLabels_.begin(); source !=
+      dataLabels_.end(); ++source) {
+    try {
+      cout << "Trying to find source " << *source << endl;
+      event.getByLabel(*source,hepMC);
+      cout << "Found source " << *source << endl;
+      break;
+    } catch (std::exception &e) {
+      cout << "Did not find a valid product named" << *source << endl;
+    }    
+  }
+  
   event.getByType(G4VtxContainer);
   event.getByType(G4TrkContainer);
   const edm::HepMCProduct *mcp = hepMC.product();
   const edm::EmbdSimTrackContainer *etc = G4TrkContainer.product();
 
+  if (mcp == 0) {
+    cout << "No source found" << endl;
+    return;
+  }  
+  
+  
   // Find and loop over vertices from HepMC
   const HepMC::GenEvent *hme = mcp -> GetEvent();
   hme -> print();
-  double distanceCut = conf_.getParameter<double>("distanceCut"); 
   
-  cout << "Distance cut set to "<<distanceCut<<endl; 
+  cout << "Distance cut set to "<<distanceCut_<<endl; 
 /*
   for (HepMC::GenEvent::vertex_const_iterator v = hme->vertices_begin(); 
        v != hme->vertices_end(); 
@@ -119,7 +138,7 @@ void MCAccessTestV::analyze(const edm::Event& event, const edm::EventSetup& c){
       ++iTVC;      
     }
     string NewV = " ";
-    if (closest > distanceCut) {
+    if (closest > distanceCut_) {
       TrackingVertex tV = TrackingVertex(mPosition);
 //    tV.setG4Vertex(EmbdSimTrackRef( itVtx, 0 ) );
       NewV = "+";

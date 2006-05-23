@@ -2,6 +2,8 @@
 #define MCAccessTestV_h
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include <string>
+#include <vector>
 
 class MCAccessTestV  : public edm::EDAnalyzer {
  public:
@@ -14,7 +16,9 @@ class MCAccessTestV  : public edm::EDAnalyzer {
 
  private:
   edm::ParameterSet conf_;
-
+  double distanceCut_;
+  std::vector<std::string> dataLabels_;
+  
 };
 
 #endif
