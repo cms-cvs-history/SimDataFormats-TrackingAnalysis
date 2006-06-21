@@ -1,22 +1,23 @@
-#include "Analysis/TrackingVertexProducer/interface/TrackingVertexProducer.h"
-#include "SimDataFormats/TrackingAnalysis/test/MCAccessTestV.h"
-#include "FWCore/Framework/interface/EDAnalyzer.h"
-#include "FWCore/Framework/interface/Event.h"
-#include "FWCore/Framework/interface/Handle.h"
-#include "FWCore/Framework/interface/EventSetup.h"
-#include "FWCore/Framework/interface/MakerMacros.h"
-#include "FWCore/Utilities/interface/EDMException.h"
-#include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "SimGeneral/TrackingAnalysis/interface/TrackingTruthProducer.h"
 
 #include "DataFormats/Common/interface/EDProduct.h"
-#include "SimDataFormats/Vertex/interface/EmbdSimVertexContainer.h"
-#include "SimDataFormats/Track/interface/EmbdSimTrackContainer.h"
 
-#include "SimDataFormats/TrackingAnalysis/interface/TrackingParticle.h"
-#include "SimDataFormats/TrackingAnalysis/interface/TrackingVertex.h"
-#include "SimDataFormats/TrackingAnalysis/interface/TrackingVertexContainer.h"
+#include "FWCore/Framework/interface/EDAnalyzer.h"
+#include "FWCore/Framework/interface/Event.h"
+#include "FWCore/Framework/interface/EventSetup.h"
+#include "FWCore/Framework/interface/Handle.h"
+#include "FWCore/Framework/interface/MakerMacros.h"
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "FWCore/Utilities/interface/EDMException.h"
 
 #include "SimDataFormats/HepMCProduct/interface/HepMCProduct.h"
+#include "SimDataFormats/TrackingAnalysis/interface/TrackingParticle.h"
+#include "SimDataFormats/TrackingAnalysis/interface/TrackingVertexContainer.h"
+#include "SimDataFormats/TrackingAnalysis/interface/TrackingVertex.h"
+#include "SimDataFormats/TrackingAnalysis/test/MCAccessTestV.h"
+#include "SimDataFormats/Track/interface/EmbdSimTrackContainer.h"
+#include "SimDataFormats/Vertex/interface/EmbdSimVertexContainer.h"
+
 #include <exception>
 //
 // should probably go to simGeneral .... well, for the moment I put it here ...
@@ -30,6 +31,7 @@ MCAccessTestV::MCAccessTestV(const edm::ParameterSet& conf){
   conf_ = conf;
   distanceCut_ = conf_.getParameter<double>("distanceCut");
   dataLabels_  = conf_.getParameter<vector<string> >("dataLabels");
+  cout << "Vertex distance cut set to " << distanceCut_ << endl; 
 }
 
 void MCAccessTestV::analyze(const edm::Event& event, const edm::EventSetup& c){
@@ -38,51 +40,35 @@ void MCAccessTestV::analyze(const edm::Event& event, const edm::EventSetup& c){
   edm::Handle<edm::EmbdSimTrackContainer>  G4TrkContainer;
   CLHEP::HepLorentzVector                  position;
 
-  auto_ptr<edm::TrackingVertexContainer> tVC( new edm::TrackingVertexContainer );  
+  auto_ptr<TrackingVertexCollection> tVC( new TrackingVertexCollection );  
 
   // Get information out of event record
   
   for (vector<string>::const_iterator source = dataLabels_.begin(); source !=
       dataLabels_.end(); ++source) {
     try {
-      cout << "Trying to find source " << *source << endl;
       event.getByLabel(*source,hepMC);
       cout << "Found source " << *source << endl;
       break;
     } catch (std::exception &e) {
-      cout << "Did not find a valid product named" << *source << endl;
+      cout << "Did not find a valid product named " << *source << endl;
     }    
   }
   
   event.getByType(G4VtxContainer);
   event.getByType(G4TrkContainer);
-  const edm::HepMCProduct *mcp = hepMC.product();
+  const edm::HepMCProduct          *mcp =          hepMC.product();
   const edm::EmbdSimTrackContainer *etc = G4TrkContainer.product();
 
   if (mcp == 0) {
-    cout << "No source found" << endl;
+    cout << "No HepMC source found" << endl;
     return;
   }  
-  
   
   // Find and loop over vertices from HepMC
   const HepMC::GenEvent *hme = mcp -> GetEvent();
   hme -> print();
   
-  cout << "Distance cut set to "<<distanceCut_<<endl; 
-/*
-  for (HepMC::GenEvent::vertex_const_iterator v = hme->vertices_begin(); 
-       v != hme->vertices_end(); 
-       ++v) {
-
-    position = (*v) -> position();
-    math::XYZPoint mPosition = math::XYZPoint(position.x(),position.y(),position.z());
-    if (position != HepLorentzVector(0,0,0,0)) {
-      cout << "HepMC " << position << endl;
-    }
-    tVC -> push_back(TrackingVertex(mPosition));
-  }
-*/
   // Find and loop over EmbdSimVertex vertices
     
   cout << "  V: EmbSimVertex #             PT: EmbSimVParticleParent" << endl 
@@ -108,6 +94,7 @@ void MCAccessTestV::analyze(const edm::Event& event, const edm::EventSetup& c){
     } else {
       InOut = "O";
     }
+    
     if (vtxParent >= 0) {                     // If there is parent track, figure out HEPMC Vertex 
       EmbdSimTrack est = etc->at(vtxParent);  // Pull track out from vector
       partHepMC =     est.genpartIndex(); // Get HepMC particle barcode
@@ -123,9 +110,8 @@ void MCAccessTestV::analyze(const edm::Event& event, const edm::EventSetup& c){
     double closest = 9e99;
     int iTVC = 0;
     int cTVC = 0;
-    for (edm::TrackingVertexContainer::const_iterator v =
-        tVC -> begin();
-        v != tVC ->end(); ++v) {
+    for (TrackingVertexCollection::const_iterator v = tVC -> begin();
+         v != tVC ->end(); ++v) {
       math::XYZPoint vPosition = v->position();   
       double distance = sqrt(pow(vPosition.X()-mPosition.X(),2) +  
                              pow(vPosition.Y()-mPosition.Y(),2) + 
@@ -140,11 +126,21 @@ void MCAccessTestV::analyze(const edm::Event& event, const edm::EventSetup& c){
     string NewV = " ";
     if (closest > distanceCut_) {
       TrackingVertex tV = TrackingVertex(mPosition);
+      // Add G4    vertex
+      // Add HepMC vertex
+      // Add TrackingParticle (or maybe elsewhere)
+      
 //    tV.setG4Vertex(EmbdSimTrackRef( itVtx, 0 ) );
       NewV = "+";
       tVC -> push_back(tV);
       cTVC = tVC->size() - 1;
-    }
+    } else {
+      // Access existing TrackingVertex
+      // Add G4    vertex
+      // Add HepMC vertex
+      // Add TrackingParticle
+    }  
+
     cout << "V " << setw(5) << index;
     cout << " PT " << setw(5) << vtxParent;             // Write parent track
     cout << " " << InOut << " ";

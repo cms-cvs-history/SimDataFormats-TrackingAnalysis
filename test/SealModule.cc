@@ -1,8 +1,6 @@
 #include "PluginManager/ModuleDef.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
-#include "SimDataFormats/TrackingAnalysis/test/MCAccessTest.h"
-#include "SimDataFormats/TrackingAnalysis/test/TrackingParticleProducer.h"
+#include "SimDataFormats/TrackingAnalysis/test/MCAccessTestV.h"
 
 DEFINE_SEAL_MODULE();
-DEFINE_ANOTHER_FWK_MODULE( MCAccessTest );
-DEFINE_ANOTHER_FWK_MODULE( TrackingParticleProducer );
+DEFINE_ANOTHER_FWK_MODULE( MCAccessTestV );
