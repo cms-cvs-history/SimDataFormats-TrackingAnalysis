@@ -7,7 +7,7 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 
 #include "DataFormats/Common/interface/EDProduct.h"
-#include "SimDataFormats/Vertex/interface/EmbdSimVertexContainer.h"
+#include "SimDataFormats/Vertex/interface/SimVertexContainer.h"
 #include "SimDataFormats/Track/interface/EmbdSimTrackContainer.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
@@ -48,13 +48,13 @@ void MCAccessTest::analyze(const edm::Event& e, const edm::EventSetup& c){
   //
   // SimTracks
   //
-  edm::Handle<edm::EmbdSimTrackContainer> G4TrkContainer;
+  edm::Handle<edm::SimTrackContainer> G4TrkContainer;
   e.getByType(G4TrkContainer);
   
   //
   // loop over it
   //
-  edm::EmbdSimTrackContainer::const_iterator itTrk;
+  edm::SimTrackContainer::const_iterator itTrk;
   for (itTrk = G4TrkContainer->begin(); itTrk != G4TrkContainer->end(); 
        ++itTrk) {
     cout <<" SimTrack Particle "<<*itTrk<<endl;
@@ -62,13 +62,13 @@ void MCAccessTest::analyze(const edm::Event& e, const edm::EventSetup& c){
   //
   // SimVertices
   //
-  edm::Handle<edm::EmbdSimVertexContainer> G4VtxContainer;
+  edm::Handle<edm::SimVertexContainer> G4VtxContainer;
   e.getByType(G4VtxContainer);
   
   //
   // loop over it
   //
-  edm::EmbdSimVertexContainer::const_iterator itVtx;
+  edm::SimVertexContainer::const_iterator itVtx;
   for (itVtx = G4VtxContainer->begin(); itVtx != G4VtxContainer->end(); 
        ++itVtx) {
     cout <<" SimVertex Particle "<<*itVtx<<endl;
