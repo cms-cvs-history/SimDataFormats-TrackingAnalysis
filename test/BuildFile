@@ -4,7 +4,7 @@
 <use name=SimDataFormats/HepMCProduct>
 <use name=clhep>
 
-<library file="SealModule.cc,MCAccessTest.cc" name=SimDataFormatsTrackingAnalysis_test>
+<library file="" name=SimDataFormatsTrackingAnalysis_test>
   <use name=FWCore/Framework>
   <flags SEAL_PLUGIN_NAME="SimDataFormatsTrackingAnalysis_test">
 </library>
