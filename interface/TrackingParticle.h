@@ -7,14 +7,15 @@
 
 #include <map>
 
+#include "DataFormats/DetId/interface/DetId.h"
+
 #include "SimDataFormats/EncodedEventId/interface/EncodedEventId.h"
-#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
+#include "SimDataFormats/HepMCProduct/interface/HepMCProduct.h"
 #include "SimDataFormats/TrackingAnalysis/interface/ParticleBase.h"
 #include "SimDataFormats/TrackingAnalysis/interface/TrackingVertex.h"
 #include "SimDataFormats/TrackingAnalysis/interface/TrackingParticleFwd.h"
 #include "SimDataFormats/TrackingHit/interface/PSimHitContainer.h"
 #include "SimDataFormats/Track/interface/SimTrackContainer.h"
-#include "DataFormats/DetId/interface/DetId.h"
 
 namespace HepMC
 {
